@@ -1,0 +1,8 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="UTF-8"><title>Test Page with Header</title></head>
+<body>
+<div th:replace="~{fragments/header :: siteHeader}"></div>
+<h1 th:text="${message}">Fallback</h1>
+</body>
+</html>
