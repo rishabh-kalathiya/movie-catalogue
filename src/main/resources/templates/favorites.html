@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="UTF-8"><title>Favorites</title></head>
+<body>
+
+<div th:replace="fragments/header :: siteHeader"></div>
+
+<div class="container" style="max-width:1100px;margin:0 auto;padding:16px">
+    <h2>My Favorite Movies</h2>
+
+    <div th:if="${#lists.isEmpty(favorites)}"
+         style="padding:12px; border:1px dashed #555; background:#f8f9fa; color:#333;">
+        No favorites yet. Go add a few from the home page!
+    </div>
+
+    <div th:if="${!#lists.isEmpty(favorites)}"
+         style="display:grid; grid-template-columns:repeat(auto-fill, minmax(220px,1fr)); gap:16px;">
+        <div th:each="f : ${favorites}"
+             style="border:1px solid #ccc; border-radius:8px; overflow:hidden; background:#fff;">
+            <img th:if="${f.posterPath != null}" th:src="${imgBase + f.posterPath}" th:alt="${f.title}"
+                 style="width:100%; display:block; aspect-ratio:2/3; object-fit:cover; background:#eee;">
+            <div style="padding:10px">
+                <strong th:text="${f.title}">Title</strong>
+                <div style="font-size:12px; color:#666" th:text="${f.releaseDate}">—</div>
+                <div style="margin-top:8px; display:flex; gap:8px;">
+                    <a th:href="@{'/movie/' + ${f.tmdbId}}">Details</a>
+                    <form th:action="@{/favorites/remove}" method="post" style="margin:0">
+                        <input type="hidden" name="tmdbId" th:value="${f.tmdbId}">
+                        <input type="hidden" name="redirect" value="/favorites">
+                        <button type="submit" style="padding:6px 10px; border:1px solid #ccc; border-radius:8px; background:#f3f4f6; cursor:pointer">
+                            Remove
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
