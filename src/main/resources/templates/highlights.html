@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Highlights</title>
+</head>
+
+<body>
+    <div th:replace="~{fragments/header :: siteHeader}"></div>
+
+    <div class="container">
+        <h2>⭐ Highlighted Movies</h2>
+
+        <div th:if="${#lists.isEmpty(highlights)}"
+            style="padding:12px; border:1px dashed var(--border); background:#0b1220; color:var(--text); border-radius:10px;">
+            No highlighted movies yet. Go to <a th:href="@{/favorites}" style="color:var(--gold)">Favorites</a> and mark
+            one ⭐.
+        </div>
+
+        <div th:if="${!#lists.isEmpty(highlights)}" class="grid">
+            <div th:each="f : ${highlights}" class="card">
+                <img th:if="${f.posterPath != null}" th:src="${imgBase + f.posterPath}" th:alt="${f.title}"
+                    style="width:100%; display:block; aspect-ratio:2/3; object-fit:cover; background:#0b1220;">
+                <div style="padding:10px;">
+                    <strong th:text="${f.title}">Title</strong>
+                    <span class="muted" style="margin-left:8px;">⭐ Highlight</span>
+                    <div class="muted" th:text="${f.releaseDate}" style="font-size:12px;">YYYY-MM-DD</div>
+                    <p th:text="${f.overview}" style="margin-top:8px;"></p>
+
+                    <div class="actions">
+                        <a th:href="@{'/movie/' + ${f.tmdbId}}" class="btn">Details</a>
+                        <form th:action="@{'/favorites/remove/' + ${f.tmdbId}}" method="post" style="margin:0">
+                            <input type="hidden" name="redirect" value="/highlights">
+                            <button type="submit" class="btn btn-danger">Remove</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

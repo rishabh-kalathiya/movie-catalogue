@@ -1,36 +1,64 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
     <title th:text="${m != null ? m.title : 'Movie details'}">Movie details</title>
 </head>
+
 <body>
 
 
-<div th:replace="fragments/header :: siteHeader"></div>
+    <div th:replace="fragments/header :: siteHeader"></div>
 
-<div class="container" style="max-width:1100px;margin:0 auto;padding:16px">
-    <a th:href="@{/}">← Back</a>
-    <h2 th:text="${m != null ? m.title : 'Movie details'}">Movie details</h2>
+    <div class="container" style="max-width:1100px;margin:0 auto;padding:16px">
+        <a th:href="@{/}">← Back</a>
+        <h2 th:text="${m != null ? m.title : 'Movie details'}">Movie details</h2>
 
-    <div th:if="${m == null}" style="padding:12px; border:1px dashed #555; background:#f8f9fa; color:#333;">
-        Could not load movie details. Check your TMDb key and try again.
-    </div>
-
-    <div th:if="${m != null}" style="display:flex; gap:24px; align-items:flex-start">
-        <img th:if="${m.poster_path != null}"
-             th:src="${imgBase + m.poster_path}" th:alt="${m.title}"
-             style="width:260px; border-radius:12px; background:#eee">
-
-        <div>
-            <p th:if="${m.tagline}" style="color:#666" th:text="${m.tagline}"></p>
-            <p><strong>Release:</strong> <span th:text="${m.release_date}">—</span></p>
-            <p><strong>Rating:</strong> <span th:text="${m.vote_average}">—</span></p>
-            <p><strong>Runtime:</strong> <span th:text="${m.runtime}">—</span> min</p>
-            <p th:text="${m.overview}">Overview…</p>
+        <div th:if="${m == null}" style="padding:12px; border:1px dashed #555; background:#f8f9fa; color:#333;">
+            Could not load movie details. Check your TMDb key and try again.
         </div>
+
+        <div th:if="${m != null}" style="display:flex; gap:24px; align-items:flex-start">
+            <img th:if="${m.poster_path != null}" th:src="${imgBase + m.poster_path}" th:alt="${m.title}"
+                style="width:260px; border-radius:12px; background:#eee">
+
+            <div>
+                <p th:if="${m.tagline}" style="color:#666" th:text="${m.tagline}"></p>
+                <p><strong>Release:</strong> <span th:text="${m.release_date}">—</span></p>
+                <p><strong>Rating:</strong> <span th:text="${m.vote_average}">—</span></p>
+                <p><strong>Runtime:</strong> <span th:text="${m.runtime}">—</span> min</p>
+                <p th:text="${m.overview}">Overview…</p>
+            </div>
+        </div>
+
+        <!-- Add if not favorite -->
+        <form th:if="${m != null && !isFavorite}" th:action="@{/favorites/add}" method="post" style="margin-top:12px">
+            <input type="hidden" name="tmdbId" th:value="${m.id}">
+            <input type="hidden" name="title" th:value="${m.title}">
+            <input type="hidden" name="posterPath" th:value="${m.poster_path}">
+            <input type="hidden" name="rating" th:value="${m.vote_average}">
+            <input type="hidden" name="releaseDate" th:value="${m.release_date}">
+            <input type="hidden" name="overview" th:value="${m.overview}">
+            <input type="hidden" name="redirect" th:value="@{'/movie/' + ${m.id}}">
+            <button type="submit"
+                style="padding:8px 12px; border:1px solid #ccc; border-radius:8px; background:#f3f4f6; cursor:pointer">
+                + Add to Favorites
+            </button>
+        </form>
+
+        <!-- Remove if already favorite -->
+        <form th:if="${m != null && isFavorite}" th:action="@{'/favorites/remove/' + ${m.id}}" method="post"
+            style="margin-top:12px">
+            <input type="hidden" name="redirect" th:value="@{'/movie/' + ${m.id}}">
+            <button type="submit"
+                style="padding:8px 12px; border:1px solid #ccc; border-radius:8px; background:#fee2e2; cursor:pointer">
+                Remove from Favorites
+            </button>
+        </form>
+
     </div>
-</div>
 
 </body>
+
 </html>

@@ -8,40 +8,44 @@
 
 <body>
 
-    <!-- Insert header fragment here -->
-    <div th:replace="fragments/header :: siteHeader"></div>
+    <!-- Use wrapped fragment expression to avoid Thymeleaf deprecation warning -->
+    <div th:replace="~{fragments/header :: siteHeader}"></div>
 
     <div class="container">
-        <h2 th:text="${#strings.isEmpty(query)} ? 'Trending this week' : 'Search results for \'' + ${query} + '\''">
-            Trending this week
+        <!-- Heading: fix Thymeleaf expression (no nested ${} inside the string) -->
+        <h2 th:if="${#strings.isEmpty(query)}">Trending this week</h2>
+
+        <h2 th:if="${!#strings.isEmpty(query)}" th:text="|Search results for '${query}'|">
+            Search results
         </h2>
 
-
         <!-- Message if TMDb is unreachable -->
-        <div th:if="${movies == null}" style="padding:12px; border:1px dashed #555; background:#f8f9fa; color:#333;">
+        <div th:if="${movies == null}"
+            style="padding:12px; border:1px dashed var(--border); background:#0b1220; color:var(--text); border-radius:10px;">
             Could not load data from TMDb. Please check your API key.
         </div>
 
         <!-- Message if TMDb returns no results -->
         <div th:if="${movies != null and #lists.isEmpty(movies)}"
-            style="padding:12px; border:1px dashed #555; background:#f8f9fa; color:#333;">
+            style="padding:12px; border:1px dashed var(--border); background:#0b1220; color:var(--text); border-radius:10px;">
             No movies found.
         </div>
 
         <!-- Movie grid -->
-        <div th:if="${movies != null}"
-            style="display:grid; grid-template-columns:repeat(auto-fill, minmax(180px,1fr)); gap:16px;">
-            <div th:each="m : ${movies}"
-                style="border:1px solid #ccc; border-radius:8px; overflow:hidden; background:#fff;">
+        <div th:if="${movies != null}" class="grid">
+            <div th:each="m : ${movies}" class="card">
                 <img th:if="${m.poster_path != null}" th:src="${imgBase + m.poster_path}" th:alt="${m.title}"
-                    style="width:100%; display:block; aspect-ratio:2/3; object-fit:cover; background:#eee;">
-                <div style="padding:8px;">
+                    style="width:100%; display:block; aspect-ratio:2/3; object-fit:cover; background:#0b1220;">
+                <div style="padding:10px;">
                     <strong th:text="${m.title}">Title</strong>
-                    <div th:text="${m.release_date}" style="font-size:12px; color:#666;">YYYY-MM-DD</div>
-                    <div style="margin-top:8px;">
-                        <a th:href="@{'/movie/' + ${m.id}}">Details</a>
+                    <div class="muted" th:text="${m.release_date}" style="font-size:12px;">YYYY-MM-DD</div>
 
-                        <form th:action="@{/favorites/add}" method="post" style="margin:0">
+                    <div class="actions">
+                        <a th:href="@{'/movie/' + ${m.id}}" class="btn">Details</a>
+
+                        <!-- + Favorite (only if not favorite) -->
+                        <form th:if="${favoriteIds == null || !favoriteIds.contains(m.id)}"
+                            th:action="@{/favorites/add}" method="post" style="margin:0">
                             <input type="hidden" name="tmdbId" th:value="${m.id}">
                             <input type="hidden" name="title" th:value="${m.title}">
                             <input type="hidden" name="posterPath" th:value="${m.poster_path}">
@@ -49,11 +53,29 @@
                             <input type="hidden" name="releaseDate" th:value="${m.release_date}">
                             <input type="hidden" name="overview" th:value="${m.overview}">
                             <input type="hidden" name="redirect" value="/">
-                            <button type="submit"
-                                style="padding:6px 10px; border:1px solid #ccc; border-radius:8px; background:#f3f4f6; cursor:pointer">
-                                + Favorite
-                            </button>
+                            <button type="submit" class="btn btn-primary">+ Favorite</button>
                         </form>
+
+                        <!-- Remove (only if already favorite) -->
+                        <form th:if="${favoriteIds != null && favoriteIds.contains(m.id)}"
+                            th:action="@{'/favorites/remove/' + ${m.id}}" method="post" style="margin:0">
+                            <input type="hidden" name="redirect" value="/">
+                            <button type="submit" class="btn btn-danger">Remove</button>
+                        </form>
+
+                        <!-- Highlight (only if already favorite) -->
+                        <form th:if="${favoriteIds != null && favoriteIds.contains(m.id)}"
+                            th:action="@{/favorites/highlight}" method="post" style="margin:0">
+                            <input type="hidden" name="tmdbId" th:value="${m.id}">
+                            <input type="hidden" name="redirect" value="/highlights">
+                            <button type="submit" class="btn btn-gold">⭐ Highlight</button>
+                        </form>
+
+                        <!-- Gentle nudge when not favorite yet -->
+                        <span th:if="${favoriteIds == null || !favoriteIds.contains(m.id)}" class="muted"
+                            style="font-size:12px;">
+                            add to favorites to highlight
+                        </span>
                     </div>
                 </div>
             </div>
