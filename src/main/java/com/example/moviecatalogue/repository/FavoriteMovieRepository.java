@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.Optional;
+import java.util.List;
 
 /**
  * Repository interface for managing favorite movies.
@@ -18,14 +19,18 @@ public interface FavoriteMovieRepository extends JpaRepository<FavoriteMovie, Lo
 
     boolean existsByTmdbId(Long tmdbId);
 
+    // List<FavoriteMovie> findByHighlightTrue();
+
+
     @Modifying
     @Transactional
     @Query("delete from FavoriteMovie f where f.tmdbId = :tmdbId")
     int deleteByTmdbIdExact(@Param("tmdbId") Long tmdbId);
 
-    Optional<FavoriteMovie> findByHighlightTrue();
+    List<FavoriteMovie> findByHighlightTrue();
 
     @Modifying
+    @Transactional
     @Query("UPDATE FavoriteMovie f SET f.highlight = false WHERE f.highlight = true")
     void clearHighlight();
 }

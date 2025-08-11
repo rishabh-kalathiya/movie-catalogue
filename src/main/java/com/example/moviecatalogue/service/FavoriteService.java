@@ -63,6 +63,7 @@ public class FavoriteService {
 
     @Transactional
     public void setHighlight(Long tmdbId) {
+        if (tmdbId == null) return;
         repo.clearHighlight();
         repo.findByTmdbId(tmdbId).ifPresent(movie -> {
             movie.setHighlight(true);
@@ -72,6 +73,10 @@ public class FavoriteService {
 
     public boolean isFavorite(Long tmdbId) {
         return tmdbId != null && repo.existsByTmdbId(tmdbId);
+    }
+
+    public List<FavoriteMovie> getHighlights() {
+        return repo.findByHighlightTrue();
     }
 
     public java.util.Set<Long> getFavoriteIds() {

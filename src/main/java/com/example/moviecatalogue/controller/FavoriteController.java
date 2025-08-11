@@ -66,11 +66,26 @@ public class FavoriteController {
         return "redirect:" + redirectTo;
     }
 
-    @PostMapping("/favorites/highlight")
-    public String highlight(@RequestParam Long tmdbId,
+    // @GetMapping("/highlights")
+    // public String viewHighlights(Model model) {
+    // model.addAttribute("movies", favoriteService.getHighlights());
+    // model.addAttribute("imgBase", "https://image.tmdb.org/t/p/w500");
+    // model.addAttribute("query", "");
+    // return "index"; // reuse index template for now
+    // }
+
+    @PostMapping("/highlight")
+    public String highlight(@RequestParam("tmdbId") Long tmdbId,
             @RequestParam(value = "redirect", required = false) String redirect) {
+        log.info("POST /favorites/highlight tmdbId={}", tmdbId);
         favoriteService.setHighlight(tmdbId);
-        return "redirect:" + (redirect != null ? redirect : "/favorites");
+
+        if (redirect == null || redirect.isBlank())
+            redirect = "/favorites";
+        if (!redirect.startsWith("/"))
+            redirect = "/" + redirect;
+
+        return "redirect:" + redirect;
     }
 
     // Probe endpoint to prove this controller is registered
