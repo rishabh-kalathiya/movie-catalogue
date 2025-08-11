@@ -40,8 +40,9 @@
                     <div th:text="${m.release_date}" style="font-size:12px; color:#666;">YYYY-MM-DD</div>
                     <div style="margin-top:8px;">
                         <a th:href="@{'/movie/' + ${m.id}}">Details</a>
-
-                        <form th:action="@{/favorites/add}" method="post" style="margin:0">
+                        <!-- Show + Favorite if not in favorites -->
+                        <form th:if="${favoriteIds == null || !favoriteIds.contains(m.id)}"
+                            th:action="@{/favorites/add}" method="post" style="margin:0">
                             <input type="hidden" name="tmdbId" th:value="${m.id}">
                             <input type="hidden" name="title" th:value="${m.title}">
                             <input type="hidden" name="posterPath" th:value="${m.poster_path}">
@@ -52,6 +53,16 @@
                             <button type="submit"
                                 style="padding:6px 10px; border:1px solid #ccc; border-radius:8px; background:#f3f4f6; cursor:pointer">
                                 + Favorite
+                            </button>
+                        </form>
+
+                        <!-- Show Remove if already favorite -->
+                        <form th:if="${favoriteIds != null && favoriteIds.contains(m.id)}"
+                            th:action="@{'/favorites/remove/' + ${m.id}}" method="post" style="margin:0">
+                            <input type="hidden" name="redirect" value="/">
+                            <button type="submit"
+                                style="padding:6px 10px; border:1px solid #ccc; border-radius:8px; background:#fee2e2; cursor:pointer">
+                                Remove
                             </button>
                         </form>
                     </div>

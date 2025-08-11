@@ -5,21 +5,19 @@ import jakarta.validation.constraints.*;
 import lombok.*;
 
 import java.time.LocalDate;
+
 /**
  * Represents a favorite movie entity.
  * This class is mapped to the 'favorite_movies' table in the database.
- * It includes fields for TMDb ID, title, poster path, rating, release date, and overview.
+ * It includes fields for TMDb ID, title, poster path, rating, release date, and
+ * overview.
  */
 @Entity
-@Table(
-    name = "favorite_movies",
-    uniqueConstraints = {
+@Table(name = "favorite_movies", uniqueConstraints = {
         @UniqueConstraint(name = "uk_favorite_tmdb_id", columnNames = "tmdbId")
-    },
-    indexes = {
+}, indexes = {
         @Index(name = "ix_favorite_tmdb_id", columnList = "tmdbId")
-    }
-)
+})
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -45,6 +43,11 @@ public class FavoriteMovie {
 
     private LocalDate releaseDate;
 
-    @Column(length = 2000) 
+    @Column(length = 2000)
     private String overview;
+
+    @Builder.Default
+    @Column(nullable = false)
+    private boolean highlight = false;
+
 }

@@ -7,12 +7,14 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import com.example.moviecatalogue.service.FavoriteService;
 
 @Controller
 @RequiredArgsConstructor
 public class HomeController {
 
     private final TmdbClient tmdbClient;
+    private final FavoriteService favoriteService;
 
     // TMDb image base (we'll use w500 for posters). Could be externalized later.
     private static final String IMG_BASE = "https://image.tmdb.org/t/p/w500";
@@ -23,6 +25,7 @@ public class HomeController {
         model.addAttribute("movies", resp != null ? resp.getResults() : null);
         model.addAttribute("imgBase", IMG_BASE);
         model.addAttribute("query", "");
+        model.addAttribute("favoriteIds", favoriteService.getFavoriteIds());
         return "index";
     }
 
@@ -35,6 +38,7 @@ public class HomeController {
         model.addAttribute("movies", resp != null ? resp.getResults() : null);
         model.addAttribute("imgBase", IMG_BASE);
         model.addAttribute("query", q);
+        model.addAttribute("favoriteIds", favoriteService.getFavoriteIds());
         return "index";
     }
 }

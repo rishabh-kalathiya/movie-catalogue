@@ -30,7 +30,7 @@ class FavoriteMovieRepositoryTest {
         assertThat(repo.existsByTmdbId(550L)).isTrue();
         assertThat(repo.findByTmdbId(550L)).isPresent();
 
-        repo.deleteByTmdbId(550L);
+        repo.deleteByTmdbIdExact(550L);
         assertThat(repo.findByTmdbId(550L)).isNotPresent();
     }
 }
